@@ -40,20 +40,10 @@ fn computeAccSum(objects: [3]core.Object, current: u64) core.Vec2 {
     var accSum = core.Vec2.zero();
     for (objects, 0..) |o, i| {
         if (i != current) {
-            const acc = computeGravitationalForce(curObject, o);
+            const acc = curObject.computeGravitationalForce(o);
             accSum.x += acc.x;
             accSum.y += acc.y;
         }
     }
     return accSum;
-}
-
-// @mlesniak move this to object struct.
-fn computeGravitationalForce(o1: core.Object, o2: core.Object) core.Vec2 {
-    const g = 6.67430E-11;
-    const r = o2.pos.sub(o1.pos);
-    const ru = r.unit();
-    const rd = r.len();
-    const f = g * (o1.mass * o2.mass) / (rd * rd);
-    return ru.scale(f);
 }
