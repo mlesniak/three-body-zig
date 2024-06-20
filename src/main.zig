@@ -13,5 +13,6 @@ pub fn main() !void {
     sim.step(1.0);
     sim.step(1.0);
 
+    // @mlesniak Introduce raylib.
 }
 
