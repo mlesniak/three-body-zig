@@ -22,10 +22,18 @@ pub fn main() !void {
     ray.InitWindow(width, height, "raylib [core] example - basic window");
     defer ray.CloseWindow();
     ray.SetTargetFPS(60);
+
+    var x: f64 = 100.0;
+    var y: f64 = 100.0;
+    const dt = 0.5;
+
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
 
-        ray.DrawCircle(100, 100, 10, ray.YELLOW);
+        ray.ClearBackground(ray.BLACK);
+        ray.DrawCircle(@intFromFloat(x), @intFromFloat(y), 10, ray.YELLOW);
+        x += dt;
+        y += dt;
 
         defer ray.EndDrawing();
     }
