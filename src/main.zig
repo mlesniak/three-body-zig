@@ -15,11 +15,18 @@ pub fn main() !void {
     // sim.step(1.0);
     // sim.step(1.0);
     // sim.step(1.0);
-    ray.InitWindow(800, 450, "raylib [core] example - basic window");
+
+    const width = 800;
+    const height = 600;
+
+    ray.InitWindow(width, height, "raylib [core] example - basic window");
     defer ray.CloseWindow();
     ray.SetTargetFPS(60);
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
+
+        ray.DrawCircle(100, 100, 10, ray.YELLOW);
+
         defer ray.EndDrawing();
     }
 }
