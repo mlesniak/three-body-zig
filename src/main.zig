@@ -30,6 +30,7 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
         .vel = .{ .x = 0, .y = 0 },
         .acc = core.Vec2.zero(),
         .mass = 1e28,
+        .color = ray.RED,
     };
 
     const o1 = core.Object{
@@ -37,6 +38,7 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
         .vel = .{ .x = 0, .y = 1.2e4 },
         .acc = core.Vec2.zero(),
         .mass = 1e26,
+        .color = ray.GREEN,
     };
 
     const o2 = core.Object{
@@ -44,11 +46,21 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
         .vel = .{ .x = 0, .y = -1.2e4 },
         .acc = core.Vec2.zero(),
         .mass = 1e23,
+        .color = ray.BLUE,
     };
-    var objects = try alloc.alloc(core.Object, 3);
+    const o3 = core.Object{
+        .pos = .{ .x = 5_000_000_000, .y = 6_000_000_000 },
+        .vel = .{ .x = 8e4, .y = 0 },
+        .acc = core.Vec2.zero(),
+        .mass = 1e24,
+        .color = ray.YELLOW
+    };
+
+    var objects = try alloc.alloc(core.Object, 4);
     objects[0] = o0;
     objects[1] = o1;
     objects[2] = o2;
+    objects[3] = o3;
     // objects[2] = o3;
     const sim = simulation.Simulation.init(objects);
     return sim;
@@ -86,7 +98,12 @@ pub fn main() !void {
             // if (i == 0) {
             //     std.debug.print("{}, {}, {}, {}\n", .{o.pos.x, x, y, f});
             // }
-            ray.DrawCircle(x, y, 10, ray.RED);
+            for (o.trail) |tp| {
+                const tx: i32 = @intFromFloat(tp.x / zoomFactor);
+                const ty: i32 = @intFromFloat(tp.y / zoomFactor);
+                ray.DrawCircle(tx, ty, 1, o.color);
+            }
+            ray.DrawCircle(x, y, 10, o.color);
         }
 
         if (ray.IsKeyDown(ray.KEY_J)) {

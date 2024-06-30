@@ -2,6 +2,8 @@ const Object = @import("core.zig").Object;
 const Vec2 = @import("core.zig").Vec2;
 const std = @import("std");
 
+
+// @mlesniak add tick here.
 pub const Simulation = struct {
     objects: []Object,
 
@@ -26,6 +28,18 @@ pub const Simulation = struct {
             const acc = accs[i];
             const newVel = o.vel.add(acc.scale(delta));
             const newPos = o.pos.add(newVel.scale(delta));
+
+            if (o.tick > 16) {
+                o.tick = 0;
+                o.trail[o.trailIndex] = o.pos;
+                o.trailIndex += 1;
+                if (o.trailIndex == o.trail.len) {
+                    o.trailIndex = 0;
+                }
+            } else {
+                o.tick += 1;
+            }
+
             o.pos = newPos;
             o.vel = newVel;
             // std.debug.print("objects[{}] = ({}, {}, {})\n", .{ i, newPos.x, newPos.y, newVel.len() });
