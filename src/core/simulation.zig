@@ -5,20 +5,20 @@ const std = @import("std");
 pub const Simulation = struct {
     objects: []Object,
 
-    pub fn init(objects: []Object) Simulation {
+    pub fn init(os: []Object) Simulation {
         return Simulation{
-            .objects = objects,
+            .objects = os,
         };
     }
 
-    pub fn step(self: *Simulation, delta: f64) void {
+    pub fn step(self: *const Simulation, delta: f64) void {
         // Let's not have an accumulator for now and simply
         // allocate enough memory for the time being.
         var accs: [128]Vec2 = undefined;
-        std.debug.print("\nStep with delta={}\n", .{delta});
 
         for (0..self.objects.len) |i| {
             accs[i] = self.computeExternalForces(i);
+            std.debug.print("acc[{}]={}\n", .{i, accs[i]});
         }
 
         for (0..self.objects.len) |i| {
@@ -28,11 +28,11 @@ pub const Simulation = struct {
             const newPos = o.pos.add(newVel.scale(delta));
             o.pos = newPos;
             o.vel = newVel;
-            std.debug.print("objects[{}] = ({}, {}, {})\n", .{ i, newPos.x, newPos.y, newVel.len() });
+            // std.debug.print("objects[{}] = ({}, {}, {})\n", .{ i, newPos.x, newPos.y, newVel.len() });
         }
     }
 
-    fn computeExternalForces(self: *Simulation, curIndex: u64) Vec2 {
+    fn computeExternalForces(self: *const Simulation, curIndex: u64) Vec2 {
         const co = self.objects[curIndex];
         var accSum = Vec2.zero();
         for (self.objects, 0..) |o, i| {
@@ -44,6 +44,9 @@ pub const Simulation = struct {
             accSum.x += acc.x;
             accSum.y += acc.y;
         }
-        return accSum;
+        return Vec2{
+            .x = accSum.x / co.mass,
+            .y = accSum.y / co.mass,
+        };
     }
 };

@@ -25,7 +25,14 @@ pub const Vec2 = struct {
   }
 
   pub fn unit(self: Vec2) Vec2 {
-    return self.scale(1.0 / self.len());
+    const length = self.len();
+    if (length == 0) {
+      return Vec2{ .x = 0, .y = 0 };
+    }
+    return Vec2{
+      .x = self.x / length,
+      .y = self.y / length,
+    };
   }
 };
 
