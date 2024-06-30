@@ -5,23 +5,50 @@ const ray = @cImport({
     @cInclude("raylib.h");
 });
 
+// @mlesniak explain units, m/s, kg, ...
 fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
+    // const o0 = core.Object{
+    //     .pos = core.Vec2{ .x = 5_000_000_000, .y = 4_000_000_000 },
+    //     .vel = core.Vec2{ .x = -1e4, .y = -1e4 },
+    //     .acc = core.Vec2{ .x = 0, .y = 0 },
+    //     .mass = 1e23,
+    // };
+    // const o1 = core.Object{
+    //     .pos = core.Vec2{ .x = 5_000_000_000, .y = 5_000_000_000 },
+    //     .vel = core.Vec2{ .x = 0, .y = -1e4 },
+    //     .acc = core.Vec2{ .x = 0, .y = 0 },
+    //     .mass = 1e24,
+    // };
+    // const o2 = core.Object{
+    //     .pos = core.Vec2{ .x = 4_000_000_000, .y = 6_500_000_000 },
+    //     .vel = core.Vec2{ .x = 3e5, .y = 1e4 },
+    //     .acc = core.Vec2{ .x = 0, .y = 0 },
+    //     .mass = 1e22,
+    // };
     const o0 = core.Object{
-        .pos = .{ .x = 7_000_000_000, .y = 1_000_000_000 },
+        .pos = .{ .x = 5_000_000_000, .y = 5_000_000_000 },
         .vel = .{ .x = 0, .y = 0 },
         .acc = core.Vec2.zero(),
-        .mass = 1e1,
+        .mass = 1e28,
     };
+
     const o1 = core.Object{
-        .pos = .{ .x = 5_000_000_000, .y = 3_000_000_000 },
-        .vel = .{ .x = 0, .y = 0 },
+        .pos = .{ .x = 4_000_000_000, .y = 4_000_000_000 },
+        .vel = .{ .x = 0, .y = 1.2e4 },
         .acc = core.Vec2.zero(),
-        .mass = 1e40,
+        .mass = 1e26,
     };
-    // const o3 = core.Object{ .pos = .{ .x = 2_500_000_000, .y = 5_000_000_000 }, .vel = .{ .x = 0, .y = 0 }, .acc = core.Vec2.zero(), .mass = 1e10 };
-    var objects = try alloc.alloc(core.Object, 2);
+
+    const o2 = core.Object{
+        .pos = .{ .x = 6_000_000_000, .y = 4_000_000_000 },
+        .vel = .{ .x = 0, .y = -1.2e4 },
+        .acc = core.Vec2.zero(),
+        .mass = 1e23,
+    };
+    var objects = try alloc.alloc(core.Object, 3);
     objects[0] = o0;
     objects[1] = o1;
+    objects[2] = o2;
     // objects[2] = o3;
     const sim = simulation.Simulation.init(objects);
     return sim;
@@ -38,10 +65,10 @@ pub fn main() !void {
     defer ray.CloseWindow();
     ray.SetTargetFPS(60);
 
-    const dt: f64 = 0.001;
+    const dt: f64 = 250;
 
     const zoomFactor: f64 = 10_000_000;
-    var advance: bool = false;
+    var advance: bool = true;
 
     var i: i32 = 0;
     while (!ray.WindowShouldClose()) {
@@ -67,12 +94,12 @@ pub fn main() !void {
         }
 
         if (advance) {
-            advance = false;
+            // advance = false;
             sim.step(dt);
-            for (sim.objects, 0..sim.objects.len) |o, idx| {
-                std.debug.print("[{}] {}\n", .{idx, o});
-            }
-            std.debug.print("\n", .{});
+            // for (sim.objects, 0..sim.objects.len) |o, idx| {
+            //     std.debug.print("[{}] {}\n", .{ idx, o });
+            // }
+            // std.debug.print("\n", .{});
         }
 
         i += 1;

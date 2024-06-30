@@ -18,7 +18,7 @@ pub const Simulation = struct {
 
         for (0..self.objects.len) |i| {
             accs[i] = self.computeExternalForces(i);
-            std.debug.print("acc[{}]={}\n", .{i, accs[i]});
+            // std.debug.print("acc[{}]={}\n", .{i, accs[i]});
         }
 
         for (0..self.objects.len) |i| {
