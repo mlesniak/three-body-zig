@@ -50,7 +50,7 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
     };
     const o3 = core.Object{
         .pos = .{ .x = 5_000_000_000, .y = 6_000_000_000 },
-        .vel = .{ .x = 8e4, .y = 0 },
+        .vel = .{ .x = 8e3, .y = 0 },
         .acc = core.Vec2.zero(),
         .mass = 1e24,
         .color = ray.YELLOW
