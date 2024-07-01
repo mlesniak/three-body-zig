@@ -39,9 +39,9 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
     };
     const o4 = core.Object{
         .pos = .{ .x = 7_000_000_000, .y = 2_000_000_000 },
-        .vel = .{ .x = -5e3, .y = 0 },
+        .vel = .{ .x = -7e3, .y = 5e2 },
         .acc = core.Vec2.zero(),
-        .mass = 1e18,
+        .mass = 1e19,
         .color = ray.PURPLE,
     };
 
@@ -82,19 +82,21 @@ pub fn main() !void {
         ray.ClearBackground(bg);
 
         for (sim.objects) |o| {
-            for (o.trail) |tp| {
+            for (o.trail, 0..) |tp, ix| {
                 const tx: i32 = @intFromFloat(tp.x / zoomFactor);
                 const ty: i32 = @intFromFloat(tp.y / zoomFactor);
-                ray.DrawCircle(tx, ty, 1, o.color);
+                const fx: f32 = @floatFromInt(ix);
+                const gx: f32 = @floatFromInt(o.trail.len);
+                ray.DrawCircle(tx, ty, 1, ray.Fade(o.color, fx/gx * 0.8));
             }
         }
 
         for (sim.objects) |o| {
             const x: i32 = @intFromFloat(o.pos.x / zoomFactor);
             const y: i32 = @intFromFloat(o.pos.y / zoomFactor);
-            ray.DrawCircle(x, y, 10, o.color);
+            ray.DrawCircle(x, y, 5, o.color);
             // Very simple antialiasing.
-            ray.DrawCircle(x + randInt(&rnd, -3, 3), y + randInt(&rnd, -3, 3), 10, ray.Fade(o.color, 0.3));
+            ray.DrawCircle(x + randInt(&rnd, -2, 2), y + randInt(&rnd, -2, 2), 10, ray.Fade(o.color, 0.2));
         }
 
         {
