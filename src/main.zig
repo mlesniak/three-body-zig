@@ -63,22 +63,23 @@ pub fn main() !void {
     const height = 1000;
 
     ray.SetConfigFlags(ray.FLAG_MSAA_4X_HINT);
-    ray.InitWindow(width, height, "Three body problem - simulation");
+    ray.InitWindow(width, height, "Gravity simulation");
     defer ray.CloseWindow();
     ray.SetTargetFPS(60);
 
     const dt: f64 = 250;
     const stepsPerFrame: i32 = 10;
 
+    var rnd = std.rand.DefaultPrng.init(1234);
     const zoomFactor: f64 = 10_000_000;
 
-    // @mlesniak Antialising? background color? ...
     var i: i32 = 0;
+    const bg = ray.Color{ .r = 15, .g = 15, .b = 15, .a = 255 };
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
         defer ray.EndDrawing();
 
-        ray.ClearBackground(ray.BLACK);
+        ray.ClearBackground(bg);
 
         for (sim.objects) |o| {
             for (o.trail) |tp| {
@@ -92,6 +93,8 @@ pub fn main() !void {
             const x: i32 = @intFromFloat(o.pos.x / zoomFactor);
             const y: i32 = @intFromFloat(o.pos.y / zoomFactor);
             ray.DrawCircle(x, y, 10, o.color);
+            // Very simple antialiasing.
+            ray.DrawCircle(x + randInt(&rnd, -3, 3), y + randInt(&rnd, -3, 3), 10, ray.Fade(o.color, 0.3));
         }
 
         {
@@ -103,4 +106,10 @@ pub fn main() !void {
 
         i += 1;
     }
+}
+
+fn randInt(r: *std.rand.Random.Xoshiro256, min: i32, max: i32) i32 {
+    const f1: f32 = @floatFromInt(min);
+    const f2: f32 = @floatFromInt(max);
+    return @intFromFloat(f1 + std.rand.float(r.random(), f32) * (f2 - f1));
 }
