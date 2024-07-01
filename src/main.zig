@@ -26,7 +26,7 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
     //     .mass = 1e22,
     // };
     const o0 = core.Object{
-        .pos = .{ .x = 5_000_000_000, .y = 5_000_000_000 },
+        .pos = .{ .x = 3_000_000_000, .y = 5_000_000_000 },
         .vel = .{ .x = 0, .y = 0 },
         .acc = core.Vec2.zero(),
         .mass = 1e28,
@@ -55,12 +55,20 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
         .mass = 1e24,
         .color = ray.YELLOW
     };
+    const o4 = core.Object{
+        .pos = .{ .x = 7_000_000_000, .y = 2_000_000_000 },
+        .vel = .{ .x = 0, .y = 0 },
+        .acc = core.Vec2.zero(),
+        .mass = 1e15,
+        .color = ray.RED
+    };
 
-    var objects = try alloc.alloc(core.Object, 4);
+    var objects = try alloc.alloc(core.Object, 5);
     objects[0] = o0;
     objects[1] = o1;
     objects[2] = o2;
     objects[3] = o3;
+    objects[4] = o4;
     // objects[2] = o3;
     const sim = simulation.Simulation.init(objects);
     return sim;
@@ -77,11 +85,14 @@ pub fn main() !void {
     defer ray.CloseWindow();
     ray.SetTargetFPS(60);
 
+    // @mlesniak idea simulate N steps per frame for more numerical precision
+    //           and have a smaller dt.
     const dt: f64 = 250;
 
     const zoomFactor: f64 = 10_000_000;
     var advance: bool = true;
 
+    // @mlesniak Antialising? background color? ...
     var i: i32 = 0;
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
