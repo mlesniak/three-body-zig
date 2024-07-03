@@ -67,33 +67,54 @@ pub fn main() !void {
     defer ray.CloseWindow();
     ray.SetTargetFPS(60);
 
+    // @mlesniak add mouse dragging of coordinates
     const dt: f64 = 250;
     const stepsPerFrame: i32 = 10;
 
     var rnd = std.rand.DefaultPrng.init(1234);
     const zoomFactor: f64 = 10_000_000;
+    var dx: f64 = -2_000_000_000;
+    const dy: f64 = -2_000_000_000;
+
+    var dxPrev: i32 = -1;
 
     var i: i32 = 0;
-    const bg = ray.Color{ .r = 15, .g = 15, .b = 15, .a = 255 };
+    const bg = ray.Color{ .r = 20, .g = 20, .b = 20, .a = 255 };
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
         defer ray.EndDrawing();
+
+        if (ray.IsMouseButtonDown(ray.MOUSE_BUTTON_LEFT)) {
+            const curX = ray.GetMouseX();
+            if (dxPrev == -1) {
+                dxPrev = curX;
+            }
+            const ddx = (curX - dxPrev);
+            if (ddx > 0) {
+                dx += -10_000_000;
+            } else if (ddx < 0) {
+                dx += 10_000_000;
+            }
+        }
+        if (ray.IsMouseButtonReleased(ray.MOUSE_BUTTON_LEFT)) {
+            dxPrev = -1;
+        }
 
         ray.ClearBackground(bg);
 
         for (sim.objects) |o| {
             for (o.trail, 0..) |tp, ix| {
-                const tx: i32 = @intFromFloat(tp.x / zoomFactor);
-                const ty: i32 = @intFromFloat(tp.y / zoomFactor);
+                const tx: i32 = @intFromFloat((tp.x - dx) / zoomFactor);
+                const ty: i32 = @intFromFloat((tp.y - dy) / zoomFactor);
                 const fx: f32 = @floatFromInt(ix);
                 const gx: f32 = @floatFromInt(o.trail.len);
-                ray.DrawCircle(tx, ty, 1, ray.Fade(o.color, fx/gx * 0.8));
+                ray.DrawCircle(tx, ty, 1, ray.Fade(o.color, fx / gx * 0.8));
             }
         }
 
         for (sim.objects) |o| {
-            const x: i32 = @intFromFloat(o.pos.x / zoomFactor);
-            const y: i32 = @intFromFloat(o.pos.y / zoomFactor);
+            const x: i32 = @intFromFloat((o.pos.x - dx) / zoomFactor);
+            const y: i32 = @intFromFloat((o.pos.y - dy) / zoomFactor);
             ray.DrawCircle(x, y, 5, o.color);
             // Very simple antialiasing.
             ray.DrawCircle(x + randInt(&rnd, -2, 2), y + randInt(&rnd, -2, 2), 10, ray.Fade(o.color, 0.2));
