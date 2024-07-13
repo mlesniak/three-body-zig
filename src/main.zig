@@ -67,16 +67,17 @@ pub fn main() !void {
     defer ray.CloseWindow();
     ray.SetTargetFPS(60);
 
-    // @mlesniak add mouse dragging of coordinates
     const dt: f64 = 250;
     const stepsPerFrame: i32 = 10;
 
     var rnd = std.rand.DefaultPrng.init(1234);
     const zoomFactor: f64 = 10_000_000;
-    var dx: f64 = -2_000_000_000;
-    const dy: f64 = -2_000_000_000;
 
-    var dxPrev: i32 = -1;
+    // Shift values.
+    var dx: f64 = 0;
+    var dy: f64 = 0;
+    var startX: i32 = 0;
+    var startY: i32 = 0;
 
     var i: i32 = 0;
     const bg = ray.Color{ .r = 20, .g = 20, .b = 20, .a = 255 };
@@ -85,19 +86,24 @@ pub fn main() !void {
         defer ray.EndDrawing();
 
         if (ray.IsMouseButtonDown(ray.MOUSE_BUTTON_LEFT)) {
+            if (startX == -1) {
+                startX = ray.GetMouseX();
+                startY = ray.GetMouseY();
+            }
             const curX = ray.GetMouseX();
-            if (dxPrev == -1) {
-                dxPrev = curX;
-            }
-            const ddx = (curX - dxPrev);
-            if (ddx > 0) {
-                dx += -10_000_000;
-            } else if (ddx < 0) {
-                dx += 10_000_000;
-            }
+            const curY = ray.GetMouseY();
+            const dxt: f64 = @floatFromInt(curX - startX);
+            const dyt: f64 = @floatFromInt(curY - startY);
+            dx += dxt * -10_000_000;
+            dy += dyt * -10_000_000;
+            std.debug.print("{}/{}\n", .{ dxt, dyt });
+            startX = curX;
+            startY = curY;
         }
         if (ray.IsMouseButtonReleased(ray.MOUSE_BUTTON_LEFT)) {
-            dxPrev = -1;
+            std.debug.print("Released\n", .{});
+            startX = -1;
+            startY = -1;
         }
 
         ray.ClearBackground(bg);
@@ -116,7 +122,7 @@ pub fn main() !void {
             const x: i32 = @intFromFloat((o.pos.x - dx) / zoomFactor);
             const y: i32 = @intFromFloat((o.pos.y - dy) / zoomFactor);
             ray.DrawCircle(x, y, 5, o.color);
-            // Very simple antialiasing.
+            // Basic beautification.
             ray.DrawCircle(x + randInt(&rnd, -2, 2), y + randInt(&rnd, -2, 2), 10, ray.Fade(o.color, 0.2));
         }
 
