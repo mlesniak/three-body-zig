@@ -76,8 +76,8 @@ pub fn main() !void {
     // Shift values.
     var dx: f64 = 0;
     var dy: f64 = 0;
-    var startX: i32 = 0;
-    var startY: i32 = 0;
+    var startX: i32 = -1;
+    var startY: i32 = -1;
 
     var i: i32 = 0;
     const bg = ray.Color{ .r = 20, .g = 20, .b = 20, .a = 255 };
