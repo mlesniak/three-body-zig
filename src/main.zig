@@ -71,7 +71,7 @@ pub fn main() !void {
     const stepsPerFrame: i32 = 10;
 
     var rnd = std.rand.DefaultPrng.init(1234);
-    const zoomFactor: f64 = 10_000_000;
+    var zoomFactor: f64 = 10_000_000;
 
     // Shift values.
     var dx: f64 = 0;
@@ -85,6 +85,15 @@ pub fn main() !void {
         ray.BeginDrawing();
         defer ray.EndDrawing();
 
+        const zoom = ray.GetMouseWheelMove();
+        if (zoom != 0) {
+            // @mlesniak adjust for location
+            zoomFactor += zoom * -1_000_000;
+            dx += zoom * 1_000_000;
+            dy += zoom * 1_000_000;
+            std.debug.print("mouse wheel {}\n", .{zoomFactor});
+        }
+
         if (ray.IsMouseButtonDown(ray.MOUSE_BUTTON_LEFT)) {
             if (startX == -1) {
                 startX = ray.GetMouseX();
@@ -94,8 +103,8 @@ pub fn main() !void {
             const curY = ray.GetMouseY();
             const dxt: f64 = @floatFromInt(curX - startX);
             const dyt: f64 = @floatFromInt(curY - startY);
-            dx += dxt * -10_000_000;
-            dy += dyt * -10_000_000;
+            dx += dxt * -zoomFactor;
+            dy += dyt * -zoomFactor;
             std.debug.print("{}/{}\n", .{ dxt, dyt });
             startX = curX;
             startY = curY;
