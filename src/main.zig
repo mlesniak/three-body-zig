@@ -11,7 +11,7 @@ fn initSimulation(alloc: *const std.mem.Allocator) !simulation.Simulation {
         .pos = .{ .x = 3_000_000_000, .y = 5_000_000_000 },
         .vel = .{ .x = 0, .y = 0 },
         .acc = core.Vec2.zero(),
-        .mass = 1e28,
+        .mass = 5e27,
         .color = ray.RED,
     };
 
@@ -59,8 +59,8 @@ pub fn main() !void {
     const alloc = std.heap.c_allocator;
     const sim = try initSimulation(&alloc);
 
-    const width = 1000;
-    const height = 1000;
+    const width = 800;
+    const height = 800;
 
     ray.SetConfigFlags(ray.FLAG_MSAA_4X_HINT);
     ray.InitWindow(width, height, "Gravity simulation");
@@ -87,11 +87,12 @@ pub fn main() !void {
 
         const zoom = ray.GetMouseWheelMove();
         if (zoom != 0) {
-            // @mlesniak adjust for location
-            zoomFactor += zoom * -1_000_000;
-            dx += zoom * 1_000_000;
-            dy += zoom * 1_000_000;
-            std.debug.print("mouse wheel {}\n", .{zoomFactor});
+            const oldZoom = zoomFactor;
+            zoomFactor += zoom * 1_000_000;
+            const fx: f64 = @floatFromInt(ray.GetMouseX());
+            dx = (fx * oldZoom - fx * zoomFactor) + dx;
+            const fy: f64 = @floatFromInt(ray.GetMouseY());
+            dy = (fy * oldZoom - fy * zoomFactor) + dy;
         }
 
         if (ray.IsMouseButtonDown(ray.MOUSE_BUTTON_LEFT)) {
@@ -123,7 +124,9 @@ pub fn main() !void {
                 const ty: i32 = @intFromFloat((tp.y - dy) / zoomFactor);
                 const fx: f32 = @floatFromInt(ix);
                 const gx: f32 = @floatFromInt(o.trail.len);
+                ray.DrawCircle(tx, ty, 1, o.color);
                 ray.DrawCircle(tx, ty, 1, ray.Fade(o.color, fx / gx * 0.8));
+                ray.DrawCircle(tx, ty, 1, ray.Fade(o.color, 0.3));
             }
         }
 
@@ -143,6 +146,7 @@ pub fn main() !void {
         }
 
         i += 1;
+        // will this crash once i reaches it's max value?
     }
 }
 
