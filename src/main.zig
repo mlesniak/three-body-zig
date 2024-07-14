@@ -106,7 +106,6 @@ pub fn main() !void {
             const dyt: f64 = @floatFromInt(curY - startY);
             dx += dxt * -zoomFactor;
             dy += dyt * -zoomFactor;
-            std.debug.print("{}/{}\n", .{ dxt, dyt });
             startX = curX;
             startY = curY;
         }
