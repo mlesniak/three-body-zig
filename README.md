@@ -9,7 +9,7 @@ and is very far away from being a complete, polished or somehow tested project.
 
 # Demo
 
-![Demo](https://github.com/mlesniak/three-body-zig/blob/main/demo.mkv)
+![Demo](https://github.com/mlesniak/three-body-zig/blob/main/demo.mp4)
 
 # Foundation
 
